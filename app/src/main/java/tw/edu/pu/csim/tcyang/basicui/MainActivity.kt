@@ -45,6 +45,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonDefaults.buttonColors
+import androidx.compose.runtime.DisposableEffect
 
 import tw.edu.pu.csim.tcyang.basicui.ui.theme.BasicUITheme
 
@@ -80,6 +81,16 @@ fun Main(modifier: Modifier = Modifier) {
         mutableStateOf(textA)
     }
     var mper: MediaPlayer? by remember { mutableStateOf(null) }
+    // 使用 DisposableEffect 來管理 MediaPlayer 的生命週期
+    // 當 Main Composable 離開組合時，會執行 onDispose 區塊
+    DisposableEffect(Unit) { // Unit 作為 key 表示這個 effect 只會執行一次
+        onDispose {
+            // 釋放 MediaPlayer 資源，避免記憶體洩漏
+            mper?.release()
+            mper = null
+        }
+    }
+
 
 
     val Animals = listOf(
@@ -195,7 +206,8 @@ fun Main(modifier: Modifier = Modifier) {
                 // 2. 歡迎修課按鈕 (暫無作用)
                 Button(
                     onClick = {
-
+                        mper?.release()
+                        mper = null
                         mper = MediaPlayer.create(context, R.raw.tcyang) //設定音樂
                         mper?.start()   //開始播放
 
@@ -213,6 +225,8 @@ fun Main(modifier: Modifier = Modifier) {
 
                 // 3. 展翅飛翔按鈕 (彈出 Toast)
                 Button(onClick = {
+                    mper?.release()
+                    mper = null
                     mper = MediaPlayer.create(context, R.raw.fly) //設定音樂
                     mper?.start()   //開始播放
 
