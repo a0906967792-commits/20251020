@@ -80,6 +80,10 @@ fun Main(modifier: Modifier = Modifier) {
     var currentToggleText by remember {
         mutableStateOf(textA)
     }
+
+    // *** 新增的狀態變數：用於切換企鵝和狐狸圖片 ***
+    var isPenguin by remember { mutableStateOf(true) } // true: 企鵝 (animal1), false: 狐狸 (animal8)
+
     var mper: MediaPlayer? by remember { mutableStateOf(null) }
     // 使用 DisposableEffect 來管理 MediaPlayer 的生命週期
     // 當 Main Composable 離開組合時，會執行 onDispose 區塊
@@ -94,11 +98,12 @@ fun Main(modifier: Modifier = Modifier) {
 
 
     val Animals = listOf(
-        R.drawable.animal0, R.drawable.animal1,
+        R.drawable.animal0, R.drawable.animal1, // [1] 是企鵝
         R.drawable.animal2, R.drawable.animal3,
         R.drawable.animal4, R.drawable.animal5,
         R.drawable.animal6, R.drawable.animal7,
-        R.drawable.animal8, R.drawable.animal9
+        R.drawable.animal8, // [8] 是狐狸
+        R.drawable.animal9
     )
 
     val AnimalsName = listOf(
@@ -201,9 +206,9 @@ fun Main(modifier: Modifier = Modifier) {
             )
 
 
-            // **第三排：歡迎修課、展翅飛翔、結束App (三個按鈕一排)**
+            // **第三排：歡迎修課、展翅飛翔、結束App (三個按鈕一排) - 保持不變**
             Row(horizontalArrangement = Arrangement.Center) {
-                // 2. 歡迎修課按鈕 (暫無作用)
+                // 2. 歡迎修課按鈕
                 Button(
                     onClick = {
                         mper?.release()
@@ -251,6 +256,44 @@ fun Main(modifier: Modifier = Modifier) {
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 10.dp)
                 ) {
                     Text(text = "結束App")
+                }
+            }
+
+            // **新增的：第四排 - 企鵝/狐狸切換按鈕 (圖片在按鈕內)**
+            Spacer(modifier = Modifier.size(10.dp)) // 與上一排按鈕間隔
+
+            val currentAnimalId = if (isPenguin) R.drawable.animal1 else R.drawable.animal8
+            val buttonText = if (isPenguin) "點我變成狐狸" else "點我變成企鵝"
+
+            Row(horizontalArrangement = Arrangement.Center) {
+                Button(
+                    onClick = {
+                        isPenguin = !isPenguin // 切換狀態
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f), // 讓按鈕佔用較多寬度
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF8C00)), // 橘色
+                    shape = CutCornerShape(10.dp),
+                    border = BorderStroke(2.dp, Color.Black),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 5.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = currentAnimalId),
+                            contentDescription = "切換動物圖示",
+                            modifier = Modifier
+                                .size(36.dp) // 較大的圖片
+                                .padding(end = 8.dp)
+                        )
+                        Text(
+                            text = buttonText,
+                            fontSize = 18.sp,
+                            color = Color.White
+                        )
+                    }
                 }
             }
         }
